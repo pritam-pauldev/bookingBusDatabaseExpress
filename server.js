@@ -16,22 +16,22 @@ connection.connect((err) => {
     return;
   } else {
     console.log("Database Connected");
-    const createUserTable = `CREATE TABLE Users(
+    const createUserTable = `CREATE TABLE IF NOT EXIST Users(
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(20),
         email VARCHAR(50)
         )`;
-    const createBusTable = `CREATE TABLE Buses(
+    const createBusTable = `CREATE TABLE IF NOT EXIST Buses(
         id INT AUTO_INCREMENT PRIMARY KEY,
         busNumber INT,
         totalSeats INT,
         availableSeats INT
     )`;
-    const createBookingTable = `CREATE TABLE Bookings(
+    const createBookingTable = `CREATE TABLE IF NOT EXIST Bookings(
         id INT AUTO_INCREMENT PRIMARY KEY,
         seatNumber INT
     )`;
-    const createPaymentTable = `CREATE TABLE Payments(
+    const createPaymentTable = `CREATE TABLE IF NOT EXIST Payments(
         id INT AUTO_INCREMENT PRIMARY KEY,
         amountPaid INT,
         paymentStatus VARCHAR(255)
@@ -45,32 +45,33 @@ connection.connect((err) => {
         console.log("User table created");
       }
     });
-      connection.execute(createBusTable, (err) => {
-          if (err) {
-              console.log(err);
-              connection.end;
-              return;
-          } else {
-              console.log("Bus table is created");
-          }
-      })
-      connection.execute(createBookingTable, (err) => {
-        if (err) {
-          console.log(err);
-          connection.end;
-          return;
-        } else {
-          console.log("Booking table created");
-        }
-      });connection.execute(createPaymentTable, (err) => {
-        if (err) {
-          console.log(err);
-          connection.end;
-          return;
-        } else {
-          console.log("Payment table created");
-        }
-      });
+    connection.execute(createBusTable, (err) => {
+      if (err) {
+        console.log(err);
+        connection.end;
+        return;
+      } else {
+        console.log("Bus table is created");
+      }
+    });
+    connection.execute(createBookingTable, (err) => {
+      if (err) {
+        console.log(err);
+        connection.end;
+        return;
+      } else {
+        console.log("Booking table created");
+      }
+    });
+    connection.execute(createPaymentTable, (err) => {
+      if (err) {
+        console.log(err);
+        connection.end;
+        return;
+      } else {
+        console.log("Payment table created");
+      }
+    });
   }
 });
 
