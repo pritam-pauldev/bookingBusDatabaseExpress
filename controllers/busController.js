@@ -1,40 +1,45 @@
-const connection = require("../utils/db_connection");
+const { Op } = require("sequelize");
+const Buses = require("../models/buses");
 
-const addNewBus = (req, res) => {
+const addNewBus = async (req, res) => {
     const { busNumber, totalSeats, availableSeats } = req.body;
-    const insertQuery = `
-        INSERT INTO Buses(busNumber, totalSeats, availableSeats)
-        VALUES(?,?,?)
-    `
-    connection.execute(insertQuery, [busNumber, totalSeats, availableSeats], (err, result) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send(err.message);
-            return;
-        } else {
-            console.log("New bus inserted");
-            res.status(200).send(`busNumber:${busNumber}, totalSeats:${totalSeats}, abvailableSeats:${availableSeats} inserted`);
-        }
-    })
+    try {
+        await Buses.create({
+            busNumber: busNumber,
+            totalSeats: totalSeats,
+            availableSeats: availableSeats,
+        });
+        console.log(`busNumber: ${busNumber}, totalSeats: ${totalSeats}, availableSeats: ${availableSeats}`);
+        res
+          .status(201)
+          .send(
+            `busNumber: ${busNumber}, totalSeats: ${totalSeats}, availableSeats: ${availableSeats}`,
+          );
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err.message);
+    }
 }
 
-const getBuses = (req, res) => {
-    const getQuery = `
-        SELECT * FROM Buses
-        WHERE availableSeats > 10;
-    `;
-    connection.execute(getQuery, (err, result) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send(err.message);
-            return;
-        } else {
-            res.status(200).json({
-                message: "buses fetched successfully",
-                data: result
-            });
-        }
-    })
+const getBuses = async (req, res) => {
+    try {
+        const buses = await Buses.findAll({
+            where: {
+                availableSeats: {
+                    [Op.gt]:10
+                }
+            }
+        });
+        console.log("Get All Buses details");
+        const result = buses.map((b) => b.toJSON());
+        res.status(200).json({
+            message: "All Bus details fetched",
+            data: result,
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err.message);
+    }
 }
 
 module.exports = {
