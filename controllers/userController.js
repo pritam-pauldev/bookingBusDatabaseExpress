@@ -1,5 +1,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const Users = require("../models/users")
+const Users = require("../models/users");
+const Booking = require("../models/bookings");
+const Bus = require("../models/buses");
 
 let addNewUser = async (req, res) => {
   const { name, email } = req.body;
@@ -14,7 +16,7 @@ let addNewUser = async (req, res) => {
     console.log(err);
     res.status(500).send(err.message);
   }
-}
+};
 
 const getUser = async (req, res) => {
   try {
@@ -31,7 +33,27 @@ const getUser = async (req, res) => {
   }
 };
 
+const getAllBookingsByUserId = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const booking = await Booking.findAll({
+      where: {
+        userId: id,
+      },
+      include: Bus,
+    });
+    console.log(booking);
+    res.status(200).json(booking);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
-    addNewUser,
-    getUser,
-}
+  addNewUser,
+  getUser,
+  getAllBookingsByUserId,
+};
